@@ -22,8 +22,8 @@ const layer_bg = {
 const layer_01 = {
   character: 'X',
   pattern: pattern_01,
-  xOffset: 2,
-  yOffset: 2,
+  xOffset: 1,
+  yOffset: 1,
 };
 
 const layer_02 = {
@@ -45,7 +45,7 @@ const layer_02 = {
 //   noise.push(row);
 // }
 
-function collapseLayers(render, layer) {
+function applyLayer(render, layer) {
   for(let y = 0; y < layer.pattern.length; y++) {
     for(let x = 0; x < layer.pattern[y].length; x++) {
       if(layer.pattern[y][x]) render[y][x] = layer.character;
@@ -70,7 +70,7 @@ function renderComposition(composition) {
   let render = renderLayer(first_layer);
   for(let l = 1; l < composition.length; l++) { // skip index 0 (bg layer)
     const current_layer = composition[l];
-    render = collapseLayers(render, current_layer);
+    render = applyLayer(render, current_layer);
   }
   printRender(render);
 }
