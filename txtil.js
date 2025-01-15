@@ -11,24 +11,24 @@ const pattern_01 = [
 const pattern_02 = [
   [1, 0],
   [0, 1]
-]
+];
 
 const layer_bg = {
   character: [' ', '.', ',', ';', ' ', '\'', '"', '´', ' '],
   pattern: pattern_bg
-}
+};
 
 const layer_01 = {
   character: 'X',
   pattern: pattern_01,
   xOffset: 2,
   yOffset: 2
-}
+};
 
 const layer_02 = {
   character: '#',
   pattern: pattern_02,
-}
+};
 
 const w = 3//39;
 const h = 3//32;
@@ -53,7 +53,7 @@ function collapseLayers(bgLayer, fgLayer) {
       }
     }
   }
-  return collapsedLayers
+  return collapsedLayers;
 }
 
 function renderLayer(layer) {
@@ -77,6 +77,6 @@ let composition = [
   layer_bg
   pattern_01,
   pattern_02,
-]
+];
 
 renderComposition(composition)
