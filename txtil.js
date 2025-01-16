@@ -14,9 +14,10 @@ const pattern_02 = [
 ];
 
 const layer_bg = {
-  //character: [' ', '.', ',', ';', ' ', "'", '"', '´', ' '],
-  character: '•',
+  character: [' ', '.', ',', ';', ' ', "'", '"', '´', ' '],
+  //character: '•',
   pattern: pattern_bg,
+  method: 'random',
 };
 
 const layer_01 = {
@@ -45,10 +46,23 @@ const layer_02 = {
 //   noise.push(row);
 // }
 
+function getCharacter(character, method) {
+  if(typeof character === 'string') return character;
+  if(Array.isArray(character)) {
+    if(method === 'random') {
+      const randomIndex = Math.floor(Math.random() * character.length);
+      return character[randomIndex];
+    }
+    else {
+      return character[0]
+    }
+  }
+}
+
 function applyLayer(render, layer) {
   for(let y = 0; y < layer.pattern.length; y++) {
     for(let x = 0; x < layer.pattern[y].length; x++) {
-      if(layer.pattern[y][x]) render[y][x] = layer.character;
+      if(layer.pattern[y][x]) render[y][x] = getCharacter(layer.character, layer.method || false);
     }
   }
   return render;
@@ -59,7 +73,7 @@ function renderLayer(layer) {
   for(let y = 0; y < layer.pattern.length; y++) {
     render.push([]);
     for(let x = 0; x < layer.pattern[y].length; x++) {
-      render[y].push(layer.character);
+      render[y].push(getCharacter(layer.character, layer.method || false));
     }
   }
   return render;
