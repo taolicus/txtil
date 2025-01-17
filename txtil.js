@@ -1,47 +1,64 @@
 const pattern_bg = [
-  [1,1,1],
-  [1,1,1],
-  [1,1,1],
+  [1, 1, 1],
+  [1, 1, 1],
+  [1, 1, 1],
 ];
 
 const pattern_01 = [
-  [1],
+  [1,1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1],
 ];
 
 const pattern_02 = [
-  [1, 0],
-  [0, 1],
+  [0,0,0,0,1,0,0,0,0],
+  [0,0,0,1,1,1,0,0,0],
+  [0,0,1,1,1,1,1,0,0],
+  [0,1,1,1,1,1,1,1,0],
+  [1,1,1,1,1,1,1,1,1],
 ];
 
 const layer_bg = {
-  character: [' ', '.', ',', ';', ' ', "'", '"', '´', ' '],
+  character: [' ',
+    '.',
+    ',',
+    ';',
+    ' ',
+    "'",
+    '"',
+    '´',
+    ' '],
   pattern: pattern_bg,
   method: 'random',
+  w: 36,
+  h: 39,
 };
 
 const layer_01 = {
-  character: 'X',
+  character: '+',
   pattern: pattern_01,
-  xOffset: 1,
-  yOffset: 1,
+  xOffset: 6,
+  yOffset: 6,
 };
 
 const layer_02 = {
   character: '#',
   pattern: pattern_02,
+  xOffset: 8,
+  yOffset: 7,
 };
 
 function getCharacter(character, method) {
-  if(Array.isArray(character)) {
-    if(method === 'random') {
+  if (Array.isArray(character)) {
+    if (method === 'random') {
       const randomIndex = Math.floor(Math.random() * character.length);
       return character[randomIndex];
-    }
-    else {
+    } else {
       return character[0]
     }
-  }
-  else {
+  } else {
     return character
   }
 }
@@ -49,9 +66,13 @@ function getCharacter(character, method) {
 function applyLayer(render, layer) {
   const xOffset = layer.xOffset || 0;
   const yOffset = layer.yOffset || 0;
-  for(let y = 0; y < layer.pattern.length; y++) {
-    for(let x = 0; x < layer.pattern[y].length; x++) {
-      if(layer.pattern[y][x]) render[y][x] = getCharacter(layer.character, layer.method || false);
+  const h = layer.h || layer.pattern.length
+  for (let y = 0; y < h; y++) {
+    const w = layer.w || layer.pattern[y].length
+    for (let x = 0; x < w; x++) {
+      const targetX = x + xOffset;
+      const targetY = y + yOffset;
+      if (layer.pattern[y][x]) render[targetY][targetX] = getCharacter(layer.character, layer.method || false);
     }
   }
   return render;
@@ -59,9 +80,11 @@ function applyLayer(render, layer) {
 
 function renderLayer(layer) {
   let render = [];
-  for(let y = 0; y < layer.pattern.length; y++) {
+  const h = layer.h || layer.pattern.length;
+  for (let y = 0; y < h; y++) {
     render.push([]);
-    for(let x = 0; x < layer.pattern[y].length; x++) {
+    const w = layer.w || layer.pattern[y].length;
+    for (let x = 0; x < w; x++) {
       render[y].push(getCharacter(layer.character, layer.method || false));
     }
   }
@@ -71,7 +94,8 @@ function renderLayer(layer) {
 function renderComposition(composition) {
   let first_layer = structuredClone(composition[0]);
   let render = renderLayer(first_layer);
-  for(let l = 1; l < composition.length; l++) { // skip index 0 (bg layer)
+  for (let l = 1; l < composition.length; l++) {
+    // skip index 0 (bg layer)
     const current_layer = composition[l];
     render = applyLayer(render, current_layer);
   }
@@ -89,8 +113,8 @@ function printRender(render) {
 
 let composition = [
   layer_bg,
-  layer_02,
   layer_01,
+  layer_02,
 ];
 
 renderComposition(composition);
