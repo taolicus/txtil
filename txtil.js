@@ -1,120 +1,55 @@
-const pattern_bg = [
-  [1, 1, 1],
-  [1, 1, 1],
-  [1, 1, 1],
-];
+import fs from 'node:fs'
+const tr = fs.readFileSync('./txt/tr.txt', 'utf8')
+const cr = fs.readFileSync('./txt/cr.txt', 'utf8')
 
-const pattern_01 = [
-  [1,1,1,1,1,1,1,1,1],
-  [1,1,1,1,1,1,1,1,1],
-  [1,1,1,1,1,1,1,1,1],
-  [1,1,1,1,1,1,1,1,1],
-  [1,1,1,1,1,1,1,1,1],
-];
-
-const pattern_02 = [
-  [0,0,0,0,1,0,0,0,0],
-  [0,0,0,1,1,1,0,0,0],
-  [0,0,1,1,1,1,1,0,0],
-  [0,1,1,1,1,1,1,1,0],
-  [1,1,1,1,1,1,1,1,1],
-];
-
-const layer_bg = {
-  character: [' ',
-    '.',
-    ',',
-    ';',
-    ' ',
-    "'",
-    '"',
-    '´',
-    ' '],
-  pattern: pattern_bg,
-  method: 'random',
-  w: 36,
-  h: 39,
-};
-
-const layer_01 = {
-  character: '+',
-  pattern: pattern_01,
-  xOffset: 6,
-  yOffset: 6,
-};
-
-const layer_02 = {
-  character: '#',
-  pattern: pattern_02,
-  xOffset: 8,
-  yOffset: 7,
-};
-
-function getCharacter(character, method) {
-  if (Array.isArray(character)) {
-    if (method === 'random') {
-      const randomIndex = Math.floor(Math.random() * character.length);
-      return character[randomIndex];
-    } else {
-      return character[0]
-    }
-  } else {
-    return character
-  }
+function txtToMap(txt) {
+  return txt.split('\n').map(line => line.split(''))
 }
 
-function applyLayer(render, layer) {
-  const xOffset = layer.xOffset || 0;
-  const yOffset = layer.yOffset || 0;
-  const h = layer.h || layer.pattern.length
-  for (let y = 0; y < h; y++) {
-    const w = layer.w || layer.pattern[y].length
-    for (let x = 0; x < w; x++) {
-      const targetX = x + xOffset;
-      const targetY = y + yOffset;
-      if (layer.pattern[y][x]) render[targetY][targetX] = getCharacter(layer.character, layer.method || false);
+function apply(map1, map2, offsetY = 0, offsetX = 0) {
+  let render = structuredClone(map1)
+  for(let y = 0; y < map2.length; y++) {
+    if(map1[y + offsetY]) {
+      for(let x = 0; x < map2[y].length; x++) {
+        if(map1[y + offsetY][x + offsetX] && map2[y][x] !== ' ') render[y + offsetY][x + offsetX] = map2[y][x]
+      }
     }
   }
-  return render;
+  return render
 }
 
-function renderLayer(layer) {
-  let render = [];
-  const h = layer.h || layer.pattern.length;
-  for (let y = 0; y < h; y++) {
-    render.push([]);
-    const w = layer.w || layer.pattern[y].length;
-    for (let x = 0; x < w; x++) {
-      render[y].push(getCharacter(layer.character, layer.method || false));
+function canvas(w, h) {
+  let canvas = []
+  for(let y = 0; y < h; y++) {
+    let row = []
+    for(let x = 0;x < w; x++) {
+      row.push(' ')
     }
+    canvas.push(row)
   }
-  return render;
+  return canvas
 }
 
-function renderComposition(composition) {
-  let first_layer = structuredClone(composition[0]);
-  let render = renderLayer(first_layer);
+function render(composition) {
+  let render = composition[0].layer
   for (let l = 1; l < composition.length; l++) {
-    // skip index 0 (bg layer)
-    const current_layer = composition[l];
-    render = applyLayer(render, current_layer);
+    const layer = composition[l]
+    const offsetY = 'offsetY' in layer ? layer.offsetY : 0
+    const offsetX = 'offsetX' in layer ? layer.offsetX : 0
+    render = apply(
+      render, 
+      layer.layer, 
+      offsetY,
+      offsetX,
+    )
   }
-  printRender(render);
+  return render.map(row => row.join('')).join('\n')
 }
 
-function printRender(render) {
-  render.forEach(y => {
-    y.forEach(x => {
-      process.stdout.write(x);
-    })
-    process.stdout.write('\n');
-  });
-}
+const layers = [
+  { layer: canvas(36, 39), },
+  { layer: txtToMap(tr), },
+  { layer: txtToMap(cr), offsetY: 4, offsetX: 6},
+]
 
-let composition = [
-  layer_bg,
-  layer_01,
-  layer_02,
-];
-
-renderComposition(composition);
+console.log(render(layers))
