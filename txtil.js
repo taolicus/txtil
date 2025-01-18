@@ -1,6 +1,4 @@
 import fs from 'node:fs'
-const tr = fs.readFileSync('./txt/tr.txt', 'utf8')
-const cr = fs.readFileSync('./txt/cr.txt', 'utf8')
 
 function txtToMap(txt) {
   return txt.split('\n').map(line => line.split(''))
@@ -27,18 +25,20 @@ function canvas(w, h) {
     }
     canvas.push(row)
   }
-  return canvas
+  return {
+    map: canvas
+  }
 }
 
 function render(composition) {
-  let render = composition[0].layer
+  let render = composition[0].map
   for (let l = 1; l < composition.length; l++) {
     const layer = composition[l]
     const offsetY = 'offsetY' in layer ? layer.offsetY : 0
     const offsetX = 'offsetX' in layer ? layer.offsetX : 0
     render = apply(
       render, 
-      layer.layer, 
+      layer.map, 
       offsetY,
       offsetX,
     )
@@ -46,10 +46,21 @@ function render(composition) {
   return render.map(row => row.join('')).join('\n')
 }
 
+function layer(path, offsetY = null, offsetX = null) {
+  const txt = fs.readFileSync(`./txt/${path}`, 'utf8')
+  let map = txtToMap(txt)
+  let layer = { map }
+  if(offsetY) layer.offsetY = offsetY
+  if(offsetX) layer.offsetX = offsetX
+  return layer
+}
+
 const layers = [
-  { layer: canvas(36, 39), },
-  { layer: txtToMap(tr), },
-  { layer: txtToMap(cr), offsetY: 4, offsetX: 6},
+  canvas(36, 39),
+  layer('tr.txt'),
+  layer('cr.txt', 4, 6),
+  layer('sq.txt', 8, 10),
 ]
 
-console.log(render(layers))
+const r = render(layers)
+console.log(r)
