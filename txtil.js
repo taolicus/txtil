@@ -1,6 +1,6 @@
 import fs from 'node:fs'
 
-function txtToMap(txt) {
+function mapTxt(txt) {
   return txt.split('\n').map(line => line.split(''))
 }
 
@@ -16,7 +16,7 @@ function apply(map1, map2, offsetY = 0, offsetX = 0) {
   return render
 }
 
-function canvas(w, h) {
+export function canvas(w, h) {
   let canvas = []
   for(let y = 0; y < h; y++) {
     let row = []
@@ -30,7 +30,7 @@ function canvas(w, h) {
   }
 }
 
-function render(composition) {
+export function render(composition) {
   let render = composition[0].map
   for (let l = 1; l < composition.length; l++) {
     const layer = composition[l]
@@ -46,24 +46,14 @@ function render(composition) {
   return render.map(row => row.join('')).join('\n')
 }
 
-function layer(path, offsetY = null, offsetX = null) {
+export function layer(path, offsetY = null, offsetX = null) {
   const txt = fs.readFileSync(`./txt/${path}`, 'utf8')
-  let map = txtToMap(txt)
+  let map = mapTxt(txt)
   let layer = { map }
   if(offsetY) layer.offsetY = offsetY
   if(offsetX) layer.offsetX = offsetX
   return layer
 }
 
-const layers = [
-  canvas(36, 39),
-  layer('tr.txt', 1, 1),
-  layer('sq.txt', 8, 14),
-  layer('tr-sm.txt', 11, 5),
-  layer('sq-sm.txt', 4, 18),
-  layer('cr-sm.txt', 14, 18),
-  layer('cr.txt', 5, 7),
-]
-
-const r = render(layers)
-console.log(r)
+//export layer
+//export render
