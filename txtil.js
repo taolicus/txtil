@@ -57,9 +57,12 @@ function layer(path, offsetY = null, offsetX = null) {
 
 const layers = [
   canvas(36, 39),
-  layer('tr.txt'),
-  layer('cr.txt', 4, 6),
-  layer('sq.txt', 8, 10),
+  layer('tr.txt', 1, 1),
+  layer('sq.txt', 8, 14),
+  layer('tr-sm.txt', 11, 5),
+  layer('sq-sm.txt', 4, 18),
+  layer('cr-sm.txt', 14, 18),
+  layer('cr.txt', 5, 7),
 ]
 
 const r = render(layers)
